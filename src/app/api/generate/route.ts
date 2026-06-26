@@ -12,6 +12,7 @@ import {
 } from "@/lib/agents";
 import { EMPTY_DNA, type CampaignDNAData } from "@/lib/types";
 import { getDefaultNiche } from "@/lib/niches";
+import { isDemoMode, demoSample } from "@/lib/demo";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -78,7 +79,34 @@ export async function POST(req: NextRequest) {
     dna = { ...EMPTY_DNA };
   }
 
-  // Monta a chamada de IA.
+  const encoder = new TextEncoder();
+
+  // ── Modo demonstração (sem chave de API) ────────────────────────────
+  // Permite testar a aplicação inteira de graça: transmite um texto de
+  // exemplo, simulando o streaming, em vez de chamar a API paga.
+  if (isDemoMode()) {
+    const sample = demoSample(agent, dna);
+    const demoStream = new ReadableStream<Uint8Array>({
+      async start(controller) {
+        const tokens = sample.split(/(\s+)/); // mantém os espaços
+        for (const tk of tokens) {
+          controller.enqueue(encoder.encode(tk));
+          await new Promise((r) => setTimeout(r, 10));
+        }
+        controller.close();
+      },
+    });
+    return new Response(demoStream, {
+      headers: {
+        "Content-Type": "text/plain; charset=utf-8",
+        "Cache-Control": "no-cache, no-transform",
+        "X-Accel-Buffering": "no",
+        "X-Demo": "1",
+      },
+    });
+  }
+
+  // ── Modo real (com chave de API) ────────────────────────────────────
   let client;
   try {
     client = getAnthropicClient();
@@ -90,8 +118,6 @@ export async function POST(req: NextRequest) {
   const model = resolveModel(modelKey);
   const system = buildSystemPrompt(dna);
   const userPrompt = buildUserPrompt(agent, instructions);
-
-  const encoder = new TextEncoder();
 
   const stream = new ReadableStream<Uint8Array>({
     async start(controller) {
