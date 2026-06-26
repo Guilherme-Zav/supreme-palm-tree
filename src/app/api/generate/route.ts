@@ -11,6 +11,7 @@ import {
   buildUserPrompt,
 } from "@/lib/agents";
 import { EMPTY_DNA, type CampaignDNAData } from "@/lib/types";
+import { getDefaultNiche } from "@/lib/niches";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -40,14 +41,15 @@ export async function POST(req: NextRequest) {
   if (!nicheId) return jsonError(400, "Selecione um nicho antes de gerar.");
 
   // Carrega o DNA da Campanha do nicho (injetado no prompt de todos os agentes).
-  let dna: CampaignDNAData = { ...EMPTY_DNA };
+  // Ordem: 1) banco (se disponível)  2) nicho padrão em código (fallback).
+  // Assim a geração funciona mesmo sem banco persistente (ex.: deploy de teste).
+  let dna: CampaignDNAData | null = null;
   try {
     const niche = await prisma.niche.findUnique({
       where: { id: nicheId },
       include: { dna: true },
     });
-    if (!niche) return jsonError(404, "Nicho não encontrado.");
-    if (niche.dna) {
+    if (niche?.dna) {
       dna = {
         businessName: niche.dna.businessName,
         product: niche.dna.product,
@@ -59,9 +61,21 @@ export async function POST(req: NextRequest) {
         competitors: niche.dna.competitors,
       };
     }
-  } catch (error) {
-    console.error("generate: load dna", error);
-    return jsonError(500, "Falha ao carregar o DNA da Campanha.");
+  } catch {
+    // banco indisponível — segue para o fallback em código
+  }
+
+  if (!dna) {
+    const fallback = getDefaultNiche(nicheId);
+    if (fallback) {
+      dna = fallback.dna;
+    }
+  }
+
+  if (!dna) {
+    // Nicho não está no banco nem nos padrões; gera com DNA vazio
+    // (o agente ainda funciona, só sem contexto do negócio).
+    dna = { ...EMPTY_DNA };
   }
 
   // Monta a chamada de IA.
