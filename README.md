@@ -1,5 +1,9 @@
 # Minha Agência IA 🚀
 
+[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2FGuilherme-Zav%2Fsupreme-palm-tree&project-name=minha-agencia-ia&repository-name=minha-agencia-ia)
+
+> 🧪 **Teste grátis em 1 toque:** clique no botão acima → faça login com o GitHub → **Deploy**. Não precisa configurar nada (entra em **Modo Demonstração**, com textos de exemplo, sem custo). Para a copy real da IA, adicione depois a variável `ANTHROPIC_API_KEY` nas configurações do projeto na Vercel.
+
 Plataforma de marketing orientada a receita com **agentes de IA pré-configurados** que geram copy, anúncios, funis e conteúdo de **alta conversão** em português — sem você precisar escrever prompts longos toda vez.
 
 Você seleciona um **nicho**, escolhe um **agente** (gerador de hooks, criador de anúncios, funil de vendas, VSL, etc.), adiciona instruções opcionais e recebe o conteúdo pronto, com **streaming em tempo real** e **histórico automático**. O tom de voz e o contexto de cada negócio ficam salvos em um **"DNA da Campanha"** reutilizável por todos os agentes.
