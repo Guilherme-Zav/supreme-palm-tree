@@ -133,7 +133,9 @@ src/
 
 ## ☁️ Como publicar na Vercel (testar no celular, etc.)
 
-> ✅ **Só quer testar os agentes (inclusive pelo celular)?** Você precisa **apenas** da `ANTHROPIC_API_KEY`. A geração de conteúdo funciona **sem banco de dados** — os 2 nichos e seus DNAs já vêm embutidos no código como fallback. (O histórico, os favoritos e a edição do DNA só persistem com um banco — veja abaixo.)
+> 🧪 **Quer só dar uma olhada, de graça e sem conta na Anthropic?** Publique **sem configurar nenhuma variável de ambiente**. O app entra em **Modo Demonstração**: gera textos de **exemplo** (com streaming, copiar, exportar, trocar de nicho) — tudo grátis. A IA real só é usada quando você define a `ANTHROPIC_API_KEY`. Para forçar o modo demo mesmo com chave configurada, defina `DEMO_MODE=1`.
+
+> ✅ **Quer a copy real de alta conversão?** Configure **apenas** a `ANTHROPIC_API_KEY`. A geração funciona **sem banco de dados** — os 2 nichos e seus DNAs já vêm embutidos no código como fallback. (Histórico, favoritos e edição do DNA só persistem com um banco — veja abaixo.)
 
 1. Suba o projeto para um repositório no GitHub (já está feito).
 2. Em [vercel.com](https://vercel.com), **Add New → Project** apontando para o repositório.

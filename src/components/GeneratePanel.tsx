@@ -39,6 +39,7 @@ export default function GeneratePanel({
   const [isGenerating, setIsGenerating] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [copied, setCopied] = useState(false);
+  const [isDemo, setIsDemo] = useState(false);
   const abortRef = useRef<AbortController | null>(null);
   const outputRef = useRef<HTMLDivElement>(null);
 
@@ -74,6 +75,7 @@ export default function GeneratePanel({
     setIsGenerating(true);
     setError(null);
     setOutput("");
+    setIsDemo(false);
 
     const controller = new AbortController();
     abortRef.current = controller;
@@ -98,6 +100,8 @@ export default function GeneratePanel({
         const data = await res.json().catch(() => ({}));
         throw new Error(data?.error || "Falha ao iniciar a geração.");
       }
+
+      setIsDemo(res.headers.get("X-Demo") === "1");
 
       const reader = res.body.getReader();
       const decoder = new TextDecoder();
@@ -319,6 +323,14 @@ export default function GeneratePanel({
             {!hasOutput && !isGenerating && !error && <EmptyState />}
 
             {isGenerating && !hasOutput && <Loading />}
+
+            {isDemo && hasOutput && (
+              <div className="mb-4 rounded-xl border border-amber-400/25 bg-amber-400/10 px-4 py-3 text-sm text-amber-100">
+                🧪 <b>Modo demonstração</b> — texto de exemplo, sem custo. Para
+                copy real de alta conversão, configure a chave da Anthropic
+                (<code>ANTHROPIC_API_KEY</code>).
+              </div>
+            )}
 
             {hasOutput && (
               <Markdown content={output} typing={isGenerating} />
