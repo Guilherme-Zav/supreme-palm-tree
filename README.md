@@ -131,13 +131,18 @@ src/
 
 ---
 
-## ☁️ Como publicar na Vercel (depois)
+## ☁️ Como publicar na Vercel (testar no celular, etc.)
 
-1. Suba o projeto para um repositório no GitHub.
-2. Em [vercel.com](https://vercel.com), **Import Project** apontando para o repositório.
+> ✅ **Só quer testar os agentes (inclusive pelo celular)?** Você precisa **apenas** da `ANTHROPIC_API_KEY`. A geração de conteúdo funciona **sem banco de dados** — os 2 nichos e seus DNAs já vêm embutidos no código como fallback. (O histórico, os favoritos e a edição do DNA só persistem com um banco — veja abaixo.)
+
+1. Suba o projeto para um repositório no GitHub (já está feito).
+2. Em [vercel.com](https://vercel.com), **Add New → Project** apontando para o repositório.
 3. Em **Settings → Environment Variables**, adicione:
-   - `ANTHROPIC_API_KEY` = sua chave
-4. **Atenção ao banco:** o SQLite local (`dev.db`) é ótimo para rodar na sua máquina, mas o sistema de arquivos da Vercel é efêmero. Para produção, use um banco gerenciado:
+   - `ANTHROPIC_API_KEY` = sua chave (de console.anthropic.com, com créditos)
+4. **Deploy.** Abra a URL gerada no navegador (Safari/Chrome do celular) e teste os agentes. 🎉
+
+### Para histórico/favoritos persistentes (opcional, produção)
+O SQLite local (`dev.db`) é ótimo na sua máquina, mas o sistema de arquivos da Vercel é efêmero. Para **persistir** histórico, favoritos e edições do DNA, use um banco gerenciado:
    - Crie um Postgres (ex.: Vercel Postgres, Neon ou Supabase).
    - Em `prisma/schema.prisma`, troque `provider = "sqlite"` por `provider = "postgresql"`.
    - Defina `DATABASE_URL` nas variáveis de ambiente da Vercel apontando para esse banco.
