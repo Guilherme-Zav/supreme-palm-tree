@@ -1,0 +1,156 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  /* Fontes (carregadas via <link> no layout; com fallback de sistema) */
+  --font-sans: "Inter", ui-sans-serif, system-ui, -apple-system, "Segoe UI",
+    Roboto, Helvetica, Arial, sans-serif;
+  --font-display: "Sora", var(--font-sans);
+
+  /* Cor de destaque do nicho ativo (sobrescrita em runtime via JS) */
+  --accent: #7c5cff;
+  --accent-soft: #a48bff;
+  --accent-shadow: rgba(124, 92, 255, 0.45);
+}
+
+* {
+  border-color: rgba(255, 255, 255, 0.06);
+}
+
+html,
+body {
+  height: 100%;
+}
+
+body {
+  background:
+    radial-gradient(1100px 700px at 12% -8%, rgba(124, 92, 255, 0.10), transparent 60%),
+    radial-gradient(900px 600px at 100% 0%, var(--accent-shadow), transparent 55%),
+    #08070c;
+  color: #e7e5ee;
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+  min-height: 100dvh;
+}
+
+::selection {
+  background: var(--accent);
+  color: #fff;
+}
+
+/* Scrollbar discreta e moderna */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255, 255, 255, 0.14) transparent;
+}
+*::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+*::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.12);
+  border-radius: 999px;
+  border: 2px solid transparent;
+  background-clip: padding-box;
+}
+*::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.22);
+  background-clip: padding-box;
+}
+
+/* Acessibilidade: foco visível no teclado */
+:focus-visible {
+  outline: 2px solid var(--accent-soft);
+  outline-offset: 2px;
+  border-radius: 8px;
+}
+
+/* Respeita prefers-reduced-motion */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+@layer components {
+  .card {
+    @apply rounded-2xl border border-white/[0.06] bg-ink-850/70 backdrop-blur-sm;
+  }
+
+  .btn {
+    @apply inline-flex select-none items-center justify-center gap-2 rounded-xl px-4 py-2.5
+      text-sm font-medium transition-all duration-150 disabled:cursor-not-allowed
+      disabled:opacity-50;
+  }
+  .btn-primary {
+    @apply btn text-white shadow-accent-glow;
+    background: linear-gradient(135deg, var(--accent), color-mix(in srgb, var(--accent) 70%, #000));
+  }
+  .btn-primary:hover:not(:disabled) {
+    filter: brightness(1.08);
+    transform: translateY(-1px);
+  }
+  .btn-ghost {
+    @apply btn border border-white/[0.08] bg-white/[0.02] text-zinc-300 hover:bg-white/[0.06]
+      hover:text-white;
+  }
+  .btn-subtle {
+    @apply btn bg-white/[0.04] text-zinc-300 hover:bg-white/[0.08] hover:text-white;
+  }
+
+  .input {
+    @apply w-full rounded-xl border border-white/[0.08] bg-ink-900/60 px-3.5 py-2.5 text-sm
+      text-zinc-100 placeholder:text-zinc-500 transition-colors;
+  }
+  .input:focus {
+    border-color: var(--accent-soft);
+    box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 22%, transparent);
+    outline: none;
+  }
+  .label {
+    @apply mb-1.5 block text-xs font-medium uppercase tracking-wide text-zinc-400;
+  }
+  .chip {
+    @apply inline-flex items-center gap-1.5 rounded-full border border-white/[0.08]
+      bg-white/[0.03] px-3 py-1 text-xs font-medium text-zinc-300;
+  }
+}
+
+/* Renderização simples de markdown no resultado */
+.prose-output {
+  @apply text-[15px] leading-relaxed text-zinc-200;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+.prose-output h1,
+.prose-output h2,
+.prose-output h3 {
+  @apply mb-2 mt-5 font-display font-semibold text-white;
+}
+.prose-output h1 { @apply text-xl; }
+.prose-output h2 { @apply text-lg; }
+.prose-output h3 { @apply text-base; }
+.prose-output strong { @apply font-semibold text-white; }
+.prose-output em { @apply italic text-zinc-300; }
+.prose-output ul { @apply my-2 list-disc space-y-1 pl-5; }
+.prose-output ol { @apply my-2 list-decimal space-y-1 pl-5; }
+.prose-output a { color: var(--accent-soft); text-decoration: underline; }
+.prose-output hr { @apply my-4 border-white/10; }
+.prose-output code {
+  @apply rounded bg-white/[0.07] px-1.5 py-0.5 font-mono text-[0.85em] text-zinc-100;
+}
+
+/* Cursor de digitação durante o streaming */
+.typing-caret::after {
+  content: "▋";
+  margin-left: 1px;
+  color: var(--accent-soft);
+  @apply animate-blink;
+}

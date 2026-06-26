@@ -1,0 +1,89 @@
+// Minha Agência IA — schema do banco (SQLite local via Prisma)
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+// Um nicho/negócio (ex: Loja de iPhones, App Fitness).
+// Cada nicho tem uma cor de destaque e um "DNA da Campanha".
+model Niche {
+  id          String   @id @default(cuid())
+  slug        String   @unique
+  name        String
+  emoji       String   @default("✨")
+  accentColor String   @default("#7c5cff") // cor de destaque (hex)
+  createdAt   DateTime @default(now())
+
+  dna         CampaignDNA?
+  generations Generation[]
+  favorites   Favorite[]
+  folders     Folder[]
+}
+
+// O "DNA da Campanha": contexto do negócio injetado em TODOS os agentes.
+model CampaignDNA {
+  id               String  @id @default(cuid())
+  nicheId          String  @unique
+  niche            Niche   @relation(fields: [nicheId], references: [id], onDelete: Cascade)
+
+  businessName     String  @default("") // Nome do negócio
+  product          String  @default("") // Produto/serviço (descrição)
+  idealCustomer    String  @default("") // Cliente ideal (ICP): quem é, dores, desejos
+  valueProposition String  @default("") // Proposta de valor / diferencial
+  toneOfVoice      String  @default("") // Tom de voz
+  objections       String  @default("") // Objeções comuns
+  proof            String  @default("") // Provas / resultados / cases (opcional)
+  competitors      String  @default("") // Concorrentes (opcional)
+
+  updatedAt        DateTime @updatedAt
+}
+
+// Pastas/projetos para organizar o histórico dentro de um nicho.
+model Folder {
+  id          String       @id @default(cuid())
+  nicheId     String
+  niche       Niche        @relation(fields: [nicheId], references: [id], onDelete: Cascade)
+  name        String
+  createdAt   DateTime     @default(now())
+
+  generations Generation[]
+}
+
+// Cada geração de conteúdo salva no histórico.
+model Generation {
+  id           String   @id @default(cuid())
+  nicheId      String
+  niche        Niche    @relation(fields: [nicheId], references: [id], onDelete: Cascade)
+
+  agentId      String   // id do agente (config em src/lib/agents.ts)
+  agentLabel   String   // rótulo no momento da geração (resiliente a mudanças)
+  agentEmoji   String   @default("✨")
+  category     String   @default("")
+
+  title        String   // título editável (default = rótulo do agente)
+  instructions String   @default("") // instruções extras informadas
+  result       String   // o texto gerado
+
+  favorite     Boolean  @default(false)
+
+  folderId     String?
+  folder       Folder?  @relation(fields: [folderId], references: [id], onDelete: SetNull)
+
+  createdAt    DateTime @default(now())
+}
+
+// Agentes favoritados (acesso rápido), por nicho.
+model Favorite {
+  id        String   @id @default(cuid())
+  nicheId   String
+  niche     Niche    @relation(fields: [nicheId], references: [id], onDelete: Cascade)
+  agentId   String
+  createdAt DateTime @default(now())
+
+  @@unique([nicheId, agentId])
+}
